@@ -14,19 +14,25 @@
 
 <input id="duration" type="number" placeholder="Seconds" />
 <button onclick="addTimer()">Add Timer</button>
-<button onclick="pauseTimer()">Pause</button>
-<button onclick="resumeTimer()">Resume</button>
+<button id="toggleBtn" onClick="togglePause()">►</button>
 <button id="repeatBtn" onClick="toggleRepeat()">Repeat OFF</button>
+<button onclick="saveSequence()">Save</button>
+<button onclick="clearQueue()">Clear</button>
 
 <div id="timers"></div>
 <h2 id="current"></h2>
+
+<h2>Saved Sequences</h2>
+<div
+            id="savedSequences">
+</div>
 
 <script>
 let queue = [];      // holds durations
 let current = null;  // currently active timer
 let remaining = 0;   // seconds left
 let interval = null; // interval ID
-let paused = false;
+let paused = true;
 let repeat = false;
 
 function addTimer() {
@@ -38,7 +44,7 @@ function addTimer() {
     document.getElementById("duration").value = "";
     renderQueue();
 
-    if (!current) startNextTimer();
+    // if (!current) startNextTimer();
 }
 
 function startNextTimer() {
@@ -72,24 +78,33 @@ function startInterval() {
         if (remaining <= 0 && repeat) {
             remaining = current;
             document.getElementById("current").innerText =
-            "Repeating Timer: " + remaining + "s";
+            "Current Timer: " + remaining + "s" + " (Repeating)";
             return
         }
 
         if (remaining <= 0) {
             clearInterval(interval);
-            alert("Timer expired!");
+            // alert("Timer expired!");
             startNextTimer();
         }
     }, 1000);
 }
 
-function pauseTimer() {
-    paused = true;
-}
+function togglePause() {
+    paused = !paused;
 
-function resumeTimer() {
-    paused = false;
+    const btn = document.getElementById("toggleBtn");
+    if (!paused) {
+        if (!current && queue.length > 0) {
+            startNextTimer();
+        }
+
+        // btn.innerText = "Pause";
+        btn.innerText = "❚❚";
+    } else {
+        // btn.innerText = "Start";
+        btn.innerText = "►";
+    }
 }
 
 function toggleRepeat() {
@@ -115,6 +130,74 @@ function renderQueue() {
 
     document.getElementById("timers").innerHTML = html;
 }
+
+function clearQueue() {
+    queue = [];
+    current = null;
+    remaining = 0;
+    renderQueue();
+}
+
+// Save all settings under one key
+function saveSequence() {
+    if (queue.length === 0) return;
+
+    let allSequences = JSON.parse(localStorage.getItem("allSequences")) || [];
+
+    allSequences.push([...queue]); // save a copy
+    localStorage.setItem("allSequences", JSON.stringify(allSequences));
+
+    renderSavedSequences();
+}
+
+// Load a saved sequence when clicked
+function loadSequence(index) {
+    let allSequences = JSON.parse(localStorage.getItem("allSequences")) || [];
+    queue = [...allSequences[index]];
+
+    current = null;
+    paused = true;
+
+    renderQueue();
+    // startNextTimer();
+}
+
+
+function renderSavedSequences() {
+    let container = document.getElementById("savedSequences");
+    let allSequences = JSON.parse(localStorage.getItem("allSequences")) || [];
+
+    if (allSequences.length === 0) {
+        container.innerHTML = "<i>No saved sequences</i>";
+        return;
+    }
+
+    let html = "";
+    allSequences.forEach((seq, idx) => {
+        html += `
+            <div class="timer-box" style="cursor:pointer;"
+                 onclick="loadSequence(${idx})">
+                <strong>Setting ${idx + 1}:</strong> [${seq.join(", ")}]
+            </div>
+        `;
+    });
+
+    container.innerHTML = html;
+}
+
+// Load saved sequences on page load
+window.onload = () => {
+    // Load saved queue (optional – you can remove this if unwanted)
+    // const saved = localStorage.getItem("timerSequence");
+    // if (saved) {
+    //     queue = JSON.parse(saved);
+    //     renderQueue();
+    //     if (!current && queue.length > 0) startNextTimer();
+    // }
+
+    renderSavedSequences(); // ALWAYS load saved lists
+};
+
 </script>
 
 </body>
