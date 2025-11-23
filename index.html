@@ -16,8 +16,9 @@
 <button onclick="addTimer()">Add Timer</button>
 <button id="toggleBtn" onClick="togglePause()">►</button>
 <button id="repeatBtn" onClick="toggleRepeat()">Repeat OFF</button>
-<button onclick="saveSequence()">Save</button>
 <button onclick="clearQueue()">Clear</button>
+<button onclick="saveSequence()">Save</button>
+<button onclick="clearSavedSequences()">Clear Saved</button>
 
 <div id="timers"></div>
 <h2 id="current"></h2>
@@ -147,6 +148,12 @@ function saveSequence() {
     allSequences.push([...queue]); // save a copy
     localStorage.setItem("allSequences", JSON.stringify(allSequences));
 
+    renderSavedSequences();
+}
+
+// Clear all saved sequences
+function clearSavedSequences() {
+    localStorage.removeItem("allSequences");
     renderSavedSequences();
 }
 
