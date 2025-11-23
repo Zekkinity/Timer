@@ -34,6 +34,9 @@ function addTimer() {
     queue.push(sec);
     renderQueue();
 
+    // Clear input
+    document.getElementById("duration").value = "";
+
     if (!current) startNextTimer();
 }
 
@@ -82,6 +85,10 @@ function resumeTimer() {
 
 function renderQueue() {
     let html = "";
+
+    // Reverse
+    queue.reverse();
+
     queue.forEach((t, i) => {
         html += `<div class="timer-box">Timer ${i + 1}: ${t}s</div>`;
     });
