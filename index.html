@@ -1,9 +1,94 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
-  <head>
-    <title>This is the title of the webpage!</title>
-  </head>
-  <body>
-    <p>This is an example paragraph. Anything in the <strong>body</strong> tag will appear on the page, just like this <strong>p</strong> tag and its contents.</p>
-  </body>
+<head>
+  <title>Timer Queue</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    #timers { margin-top: 20px; }
+    .timer-box { padding: 10px; border: 1px solid black; margin-bottom: 10px; }
+  </style>
+</head>
+<body>
+
+<h1>Timer Queue</h1>
+
+<input id="duration" type="number" placeholder="Seconds" />
+<button onclick="addTimer()">Add Timer</button>
+<button onclick="pauseTimer()">Pause</button>
+<button onclick="resumeTimer()">Resume</button>
+
+<div id="timers"></div>
+<h2 id="current"></h2>
+
+<script>
+let queue = [];      // holds durations
+let current = null;  // currently active timer
+let remaining = 0;   // seconds left
+let interval = null; // interval ID
+let paused = false;
+
+function addTimer() {
+    const sec = parseInt(document.getElementById("duration").value);
+    if (!sec || sec <= 0) return;
+
+    queue.push(sec);
+    renderQueue();
+
+    if (!current) startNextTimer();
+}
+
+function startNextTimer() {
+    if (queue.length === 0) {
+        current = null;
+        document.getElementById("current").innerText = "No timers left";
+        return;
+    }
+
+    current = queue.shift();
+    remaining = current;
+
+    document.getElementById("current").innerText = "Timer Started: " + remaining + "s";
+    renderQueue();
+
+    startInterval();
+}
+
+function startInterval() {
+    clearInterval(interval);
+
+    interval = setInterval(() => {
+        if (paused) return;
+
+        remaining--;
+
+        document.getElementById("current").innerText =
+            "Current Timer: " + remaining + "s";
+
+        if (remaining <= 0) {
+            clearInterval(interval);
+            alert("Timer expired!");
+            startNextTimer();
+        }
+    }, 1000);
+}
+
+function pauseTimer() {
+    paused = true;
+}
+
+function resumeTimer() {
+    paused = false;
+}
+
+function renderQueue() {
+    let html = "";
+    queue.forEach((t, i) => {
+        html += `<div class="timer-box">Timer ${i + 1}: ${t}s</div>`;
+    });
+    document.getElementById("timers").innerHTML = html;
+}
+</script>
+
+</body>
 </html>
+
