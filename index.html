@@ -16,6 +16,7 @@
 <button onclick="addTimer()">Add Timer</button>
 <button onclick="pauseTimer()">Pause</button>
 <button onclick="resumeTimer()">Resume</button>
+<button id="repeatBtn" onClick="toggleRepeat()">Repeat OFF</button>
 
 <div id="timers"></div>
 <h2 id="current"></h2>
@@ -26,16 +27,16 @@ let current = null;  // currently active timer
 let remaining = 0;   // seconds left
 let interval = null; // interval ID
 let paused = false;
+let repeat = false;
 
 function addTimer() {
     const sec = parseInt(document.getElementById("duration").value);
     if (!sec || sec <= 0) return;
 
     queue.push(sec);
-    renderQueue();
-
     // Clear input
     document.getElementById("duration").value = "";
+    renderQueue();
 
     if (!current) startNextTimer();
 }
@@ -51,8 +52,8 @@ function startNextTimer() {
     remaining = current;
 
     document.getElementById("current").innerText = "Timer Started: " + remaining + "s";
-    renderQueue();
 
+    renderQueue();
     startInterval();
 }
 
@@ -66,6 +67,14 @@ function startInterval() {
 
         document.getElementById("current").innerText =
             "Current Timer: " + remaining + "s";
+
+        // Repeat feature
+        if (remaining <= 0 && repeat) {
+            remaining = current;
+            document.getElementById("current").innerText =
+            "Repeating Timer: " + remaining + "s";
+            return
+        }
 
         if (remaining <= 0) {
             clearInterval(interval);
@@ -83,15 +92,27 @@ function resumeTimer() {
     paused = false;
 }
 
+function toggleRepeat() {
+    repeat = !repeat;
+
+    const btn = document.getElementById("repeatBtn");
+    if (repeat) {
+        btn.innerText = "Repeat ON";
+        btn.classList.add("active");
+    } else {
+        btn.innerText = "Repeat OFF";
+        btn.classList.remove("active");
+    }
+}
+
 function renderQueue() {
     let html = "";
 
-    // Reverse
-    queue.reverse();
-
-    queue.forEach((t, i) => {
+    // Display newest timer at bottom without modifying actual queue
+    queue.slice().forEach((t, i) => {
         html += `<div class="timer-box">Timer ${i + 1}: ${t}s</div>`;
     });
+
     document.getElementById("timers").innerHTML = html;
 }
 </script>
