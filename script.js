@@ -44,7 +44,7 @@ function startInterval() {
         document.getElementById("current").innerText =
             "Current Timer: " + remaining + "s";
 
-        if (remaining == 2 || remaining == 1) {
+        if (remaining == 3 || remaining == 2 || remaining == 1) {
             playDot();
         } else if (remaining == 0) {
             playDash();
@@ -54,7 +54,7 @@ function startInterval() {
         if (remaining <= 0 && repeat) {
             remaining = current;
             document.getElementById("current").innerText =
-            "Current Timer: " + remaining + "s" + " (Repeating)";
+                "Current Timer: " + remaining + "s" + " (Repeating)";
             return
         }
 
@@ -186,35 +186,65 @@ window.onload = () => {
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
 function playDot() {
+    const duration = 0.12;
+    // 0.15
+    // 0.12
+    // 0.1
+    const frequency = 880;
+    // 800
+    // 1000
+    // 880
+    const volume = 0.3;
+    // 0.4
+    // 0.5
+    const type = 'sine';
+    // sine, square, triangle
+
     const oscillator = audioContext.createOscillator();
     const gainNode = audioContext.createGain();
-    
+
     oscillator.connect(gainNode);
     gainNode.connect(audioContext.destination);
-    
-    oscillator.frequency.value = 800; // Frequency in Hz
-    oscillator.type = 'sine';
-    
-    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
-    
+
+    oscillator.frequency.value = frequency; // Frequency in Hz
+    oscillator.type = type;
+
+    gainNode.gain.setValueAtTime(volume, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+
     oscillator.start(audioContext.currentTime);
-    oscillator.stop(audioContext.currentTime + 0.1); // Dot = 0.1s
+    oscillator.stop(audioContext.currentTime + duration); // Dot = 0.1s
 }
 
 function playDash() {
+    const duration = 0.6; // Dash = 0.3s
+    // 0.5
+    // 0.6
+    // 0.4
+    const frequency = 660;
+    // 600
+    // 1200
+    // 660
+    const volume = 0.5;
+    // 0.5
+    // 0.6
+    // 0.5
+    const type = 'sine';
+    // sine
+    // square
+
     const oscillator = audioContext.createOscillator();
     const gainNode = audioContext.createGain();
-    
+
     oscillator.connect(gainNode);
     gainNode.connect(audioContext.destination);
-    
-    oscillator.frequency.value = 800;
-    oscillator.type = 'sine';
-    
-    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
-    
+
+    oscillator.frequency.value = frequency;
+    oscillator.type = type;
+
+    gainNode.gain.setValueAtTime(volume, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+
     oscillator.start(audioContext.currentTime);
-    oscillator.stop(audioContext.currentTime + 0.8); // Dash = 0.3s
+    oscillator.stop(audioContext.currentTime + duration);
 }
