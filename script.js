@@ -185,6 +185,8 @@ window.onload = () => {
 // Audio context for beeps
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
+let volume = 0.3;
+
 function playDot() {
     const duration = 0.12;
     // 0.15
@@ -194,9 +196,6 @@ function playDot() {
     // 800
     // 1000
     // 880
-    const volume = 0.3;
-    // 0.4
-    // 0.5
     const type = 'sine';
     // sine, square, triangle
 
@@ -225,10 +224,6 @@ function playDash() {
     // 600
     // 1200
     // 660
-    const volume = 0.5;
-    // 0.5
-    // 0.6
-    // 0.5
     const type = 'sine';
     // sine
     // square
@@ -248,3 +243,8 @@ function playDash() {
     oscillator.start(audioContext.currentTime);
     oscillator.stop(audioContext.currentTime + duration);
 }
+
+const slider = document.getElementById("volumeSlider");
+slider.addEventListener("input", () => {
+    volume = slider.value;
+});
